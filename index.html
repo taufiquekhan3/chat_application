@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatApp</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+   
+    <div class="container-outer">
+        <div class="box">
+            <div class="box-content">
+            
+                <div class="message-recieved recieved">
+                    <ul id="messages-r">
+                    </ul>
+                  </div>
+      
+            <div class="message-sent sent">
+              <ul id="messages">
+              </ul>
+            </div>
+
+            
+            
+            
+
+            </div>
+    
+            </div>  
+            <div class="button-input">
+            <input id="message_input" autocomplete="on" required="autocomplete" placeholder="type your message here..."/>
+            <button id="send-button">Send</button>
+            </div>
+    </div>
+
+    <script  defer src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script defer type="module">
+        const socket = io();
+   
+        //data is being send from input box to server with emit function
+        function sendMessage() {
+            const input = document.getElementById('message_input');
+            const Message = input.value.trim();
+            
+            if(Message !== ''){
+                
+                input.value = '';
+                socket.emit('send',Message)
+                addMessage(Message)
+            }
+            
+            
+        }
+
+        document.getElementById('send-button').addEventListener('click',sendMessage)
+        
+      
+       //data display from server 
+        function addMessage(datadisplay) {
+             const MessageList = document.getElementById('messages');
+             const li = document.createElement('li')
+             li.classList.add('list-style')
+             const messageDiv = document.createElement('div');
+              messageDiv.classList.add('message-content');
+              messageDiv.textContent = datadisplay;
+
+             li.appendChild(messageDiv)
+             MessageList.appendChild(li);
+
+             
+        }   
+            
+        function addMessage1(datadisplay) {
+             const MessageList = document.getElementById('messages-r');
+             const li = document.createElement('li')
+             li.classList.add('list-style1')
+             const messageDiv = document.createElement('div');
+              messageDiv.classList.add('content');
+              messageDiv.textContent = datadisplay;
+
+             li.appendChild(messageDiv)
+             MessageList.appendChild(li);
+        }   
+
+        //document.getElementById('history').addEventListener('click',chathisfunc)
+
+       
+    
+           //getting prompt and taking name
+           const name = prompt("enter your name");
+           socket.emit('login',name);
+
+           socket.on('login done', usernamein => {
+            console.log(usernamein)
+              addMessage(usernamein)
+           })
+ 
+           
+
+           socket.on('receive',data => {
+            console.log("message received")
+            addMessage1(`${data.name}:${data.message}`)
+           })
+             
+        const input = document.getElementById('message_input');
+
+        input.addEventListener("keydown",(event) => {
+            if(event.key === "Enter") {
+            const input = document.getElementById('message_input');
+            const Message = input.value.trim();
+            
+            if(Message !== ''){
+                
+                input.value = '';
+                socket.emit('send',Message)
+                addMessage(Message)
+            }
+        }
+
+        })
+         socket.emit("message","thankyou server i am here")
+        
+    </script>
+</body>
+</html>
